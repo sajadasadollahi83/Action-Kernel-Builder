@@ -122,13 +122,13 @@ jobs:
         export SUBARCH=ARM64
         export CLANG_TRIPLE=aarch64-linux-gnu-
         export CROSS_COMPILE=aarch64-linux-gnu-
-        export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+        export CROSS_COMPILE_ARM32=arm-linux-androideabi-
 
         export KBUILD_BUILD_USER="ventur"
         export KBUILD_BUILD_HOST="Github"
 
-        make O=out clean mrproper CC=clang ${{ github.event.inputs.CODENAME }}_user_defconfig LLVM=1 LLVM_IAS=1 LD=ld.lld HOSTLD=ld.lld HOSTLDFLAGS="-fuse-ld=lld -lyaml -v"
-        make O=out CC=clang -j$(nproc --all) HOSTCC=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang -v HOSTCXX=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang++ -v LD=${{ steps.tools.outputs.tools-folder }}/clang/bin/ld.lld -v AR=${{ steps.tools.outputs.tools-folder }}/clang/bin/llvm-ar LLVM=1 LLVM_IAS=1 CC=" clang --cuda-path=/dev/null -v"
+        make O=out clean mrproper CC=clang ${{ github.event.inputs.CODENAME }}_user_defconfig LLVM=1 LLVM_IAS=1 LD=ld.lld HOSTLD=ld.lld HOSTLDFLAGS=-fuse-ld=lld
+        make O=out CC=clang -j$(nproc --all) HOSTCC=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang HOSTCXX=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang++ LD=${{ steps.tools.outputs.tools-folder }}/clang/bin/ld.lld AR=${{ steps.tools.outputs.tools-folder }}/clang/bin/llvm-ar LLVM=1 LLVM_IAS=1 CC=" clang --cuda-path=/dev/null"
 
         echo "elapsed_time=$(echo "$(date +%s)"-"${{ steps.workspace.outputs.start_time }}" | bc)" >> $GITHUB_OUTPUT
       working-directory: ${{ steps.kernel.outputs.kernel-folder }}
