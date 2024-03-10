@@ -1,4 +1,4 @@
-name: Kernel Build (zahedan) - clang-r416183b
+name: Kernel Build (sweet)
 
 on:
   workflow_dispatch:
