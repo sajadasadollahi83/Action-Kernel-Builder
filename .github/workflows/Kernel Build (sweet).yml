@@ -127,8 +127,8 @@ jobs:
         export KBUILD_BUILD_USER="ventur"
         export KBUILD_BUILD_HOST="Github"
 
-        make O=out clean mrproper CC=clang ${{ github.event.inputs.CODENAME }}_user_defconfig LLVM=1 LLVM_IAS=1 LD=ld.lld HOSTLD=ld.lld HOSTLDFLAGS="-fuse-ld=lld -lyaml"
-        make O=out CC=clang -j$(nproc --all) HOSTCC=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang HOSTCXX=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang++ LD=${{ steps.tools.outputs.tools-folder }}/clang/bin/ld.lld AR=${{ steps.tools.outputs.tools-folder }}/clang/bin/llvm-ar LLVM=1 LLVM_IAS=1 CC=" clang --cuda-path=/dev/null"
+        make O=out clean mrproper CC=clang ${{ github.event.inputs.CODENAME }}_user_defconfig LLVM=1 LLVM_IAS=1 LD=ld.lld HOSTLD=ld.lld HOSTLDFLAGS="-fuse-ld=lld -lyaml -v"
+        make O=out CC=clang -j$(nproc --all) HOSTCC=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang -v HOSTCXX=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang++ -v LD=${{ steps.tools.outputs.tools-folder }}/clang/bin/ld.lld -v AR=${{ steps.tools.outputs.tools-folder }}/clang/bin/llvm-ar LLVM=1 LLVM_IAS=1 CC=" clang --cuda-path=/dev/null -v"
 
         echo "elapsed_time=$(echo "$(date +%s)"-"${{ steps.workspace.outputs.start_time }}" | bc)" >> $GITHUB_OUTPUT
       working-directory: ${{ steps.kernel.outputs.kernel-folder }}
