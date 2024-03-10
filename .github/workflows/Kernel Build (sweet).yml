@@ -82,7 +82,7 @@ jobs:
         
         git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-msm-redbull-4.19-android14 --depth=1
         git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-msm-redbull-4.19-android14 --depth=1
-        git clone https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 clang
+        git clone https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 clang --depth=1
         
         echo "tools-folder=$(pwd)" >> $GITHUB_OUTPUT
       working-directory: ${{ steps.workspace.outputs.workspace-folder }}
@@ -127,7 +127,7 @@ jobs:
         export KBUILD_BUILD_USER="Ventur"
         export KBUILD_BUILD_HOST="Github"
 
-        make O=out CC=clang ${{ github.event.inputs.CODENAME }}_user_defconfig LLVM=1 LLVM_IAS=1 LD=ld.lld
+        make O=out CC=clang ${{ github.event.inputs.CODENAME }}_user_defconfig LLVM=1 LLVM_IAS=1
         make O=out CC=clang -j$(nproc --all) HOSTCC=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang HOSTCXX=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang++ LD=${{ steps.tools.outputs.tools-folder }}/clang/bin/ld.lld AR=${{ steps.tools.outputs.tools-folder }}/clang/bin/llvm-ar LLVM=1 LLVM_IAS=1 CC=" clang --cuda-path=/dev/null"
 
         echo "elapsed_time=$(echo "$(date +%s)"-"${{ steps.workspace.outputs.start_time }}" | bc)" >> $GITHUB_OUTPUT
