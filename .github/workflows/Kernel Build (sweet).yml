@@ -84,7 +84,7 @@ jobs:
         
         git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-msm-redbull-4.19-android14 --depth=1
         git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-msm-redbull-4.19-android14 --depth=1
-        git clone https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 --depth=1 clang
+        git clone https://github.com/itisFarzin/android_prebuilts_clang_host_linux-x86_clang-r416183b clang
         
         echo "tools-folder=$(pwd)" >> $GITHUB_OUTPUT
       working-directory: ${{ steps.workspace.outputs.workspace-folder }}
