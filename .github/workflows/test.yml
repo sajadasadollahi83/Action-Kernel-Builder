@@ -15,6 +15,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y flex bison build-essential ccache libssl-dev libelf-dev libncurses5-dev libncursesw5-dev llvm lld clang libyaml-dev
 
+    - name: Install Device Tree Compiler
+      run: |
+        sudo apt-get install -y device-tree-compiler
+
+    - name: Verify DTC Installation
+      run: |
+        dtc --version
+
     - name: Verify YAML installation
       run: |
         dpkg -l | grep libyaml
@@ -26,18 +34,6 @@ jobs:
         ref: 'lineage-21-ksu'
 
     # ... rest of your steps ...
-    
-
-    - name: Clone toolchain
-      run: |
-        git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 toolchain
-        echo "PATH=$(pwd)/toolchain/bin:/usr/lib/ccache:$PATH" >> $GITHUB_ENV
-        echo "LD_LIBRARY_PATH=$(pwd)/toolchain/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
-    - name: Set up environment
-      run: |
-        echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
-        echo "KBUILD_BUILD_HOST=playground" >> $GITHUB_ENV
 
     - name: Build Kernel
       run: |
@@ -56,3 +52,4 @@ jobs:
       with:
         name: kernel
         path: out/arch/arm64/boot/Image.gz-dtb
+        
