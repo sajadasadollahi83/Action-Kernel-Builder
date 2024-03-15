@@ -3,51 +3,35 @@ name: Build Kernel for sweet test
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'  # Scheduled to run at midnight UTC every day.
+    - cron: '0 0 * * *'  # Run at midnight UTC every day.
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install dependencies
+    - name: Setup Environment
       run: |
         sudo apt-get update
-        sudo apt-get install -y flex bison build-essential ccache libssl-dev libelf-dev libncurses5-dev libncursesw5-dev llvm lld clang libyaml-dev
-
-    - name: Install Device Tree Compiler
-      run: |
-        sudo apt-get install -y device-tree-compiler
-
-    - name: Verify DTC Installation
-      run: |
+        sudo apt-get install -y flex bison build-essential ccache libssl-dev libelf-dev libncurses5-dev libncursesw5-dev llvm lld clang libyaml-dev device-tree-compiler
         dtc --version
-
-    - name: Verify YAML installation
-      run: |
         dpkg -l | grep libyaml
 
-    - name: Checkout kernel source
-      uses: actions/checkout@v2
-      with:
-        repository: 'sajadasadollahi83/kernel_xiaomi_sweet_kewl'
-        ref: 'lineage-21-ksu'
-
-    # ... rest of your steps ...
+    - name: Prepare Kernel Source and Toolchain
+      run: |
+        git clone --depth=1 https://github.com/sajadasadollahi83/kernel_xiaomi_sweet_kewl.git -b lineage-21-ksu
+        git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 17 toolchain
+        echo "PATH=$(pwd)/toolchain/bin:/usr/lib/ccache:$PATH" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=$(pwd)/toolchain/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
+        echo "KBUILD_BUILD_HOST=playground" >> $GITHUB_ENV
 
     - name: Build Kernel
       run: |
         make O=out ARCH=arm64 sweet_user_defconfig
-        make -j$(nproc) \
-          O=out \
-          ARCH=arm64 \
-          LLVM_IAS=1 \
-          CC="ccache clang" \
-          LD=ld.lld \
-          CROSS_COMPILE=aarch64-linux-gnu- \
-          CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+        make -j$(nproc) O=out ARCH=arm64 LLVM_IAS=1 CC="ccache clang" LD=ld.lld CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
-    - name: Upload artifacts
+    - name: Upload Kernel Artifact
       uses: actions/upload-artifact@v2
       with:
         name: kernel
