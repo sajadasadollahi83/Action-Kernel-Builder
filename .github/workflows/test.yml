@@ -18,7 +18,7 @@ jobs:
     - name: Checkout kernel source
       uses: actions/checkout@v2
       with:
-        repository: 'sajadasadollahi84/kernel_xiaomi_sweet_kewl'
+        repository: 'sajadasadollahi83/kernel_xiaomi_sweet_kewl'
         ref: 'lineage-21-ksu'
 
     - name: Clone toolchain
