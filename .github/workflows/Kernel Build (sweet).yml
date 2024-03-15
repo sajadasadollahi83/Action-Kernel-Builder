@@ -83,7 +83,7 @@ jobs:
         fi
         echo "PATH=$(pwd)/toolchain/bin:$PATH" >> $GITHUB_ENV
         
-        echo "PATH=$"/usr/lib/ccache:$PATH" >> $GITHUB_ENV
+        echo "PATH=/usr/lib/ccache:$PATH" >> $GITHUB_ENV
         
         echo "LD_LIBRARY_PATH=$(pwd)/toolchain/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
         
