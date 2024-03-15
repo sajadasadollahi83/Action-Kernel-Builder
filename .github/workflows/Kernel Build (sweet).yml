@@ -82,11 +82,11 @@ jobs:
           git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 toolchain
         fi
         echo "PATH=$(pwd)/toolchain/bin:$PATH" >> $GITHUB_ENV
-        PATH=$(pwd)/toolchain/bin:/usr/lib/ccache:$PATH" >> $GITHUB_ENV
-        echo "LD_LIBRARY_PATH=$(pwd)/toolchain/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-        echo "tools-folder=$(pwd)" >> $GITHUB_OUTPUT
         
-
+        echo "PATH=$"/usr/lib/ccache:$PATH" >> $GITHUB_ENV
+        
+        echo "LD_LIBRARY_PATH=$(pwd)/toolchain/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        
         echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
         echo "KBUILD_BUILD_HOST=GitHub" >> $GITHUB_ENV
       working-directory: ${{ steps.workspace.outputs.workspace-folder }}
