@@ -13,13 +13,20 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y flex bison build-essential ccache libssl-dev libelf-dev libncurses5-dev libncursesw5-dev llvm lld clang
+        sudo apt-get install -y flex bison build-essential ccache libssl-dev libelf-dev libncurses5-dev libncursesw5-dev llvm lld clang libyaml-dev
+
+    - name: Verify YAML installation
+      run: |
+        dpkg -l | grep libyaml
 
     - name: Checkout kernel source
       uses: actions/checkout@v2
       with:
         repository: 'sajadasadollahi83/kernel_xiaomi_sweet_kewl'
         ref: 'lineage-21-ksu'
+
+    # ... rest of your steps ...
+    
 
     - name: Clone toolchain
       run: |
