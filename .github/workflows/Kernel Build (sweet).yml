@@ -8,23 +8,23 @@ on:
         required: false
       KERNEL_TREE:
         description: 'Kernel Tree'
-        default: 'https://github.com/itisFarzin/kernel_daria_mt6877'
+        default: 'https://github.com/sajadasadollahi83/kernel_xiaomi_sweet_keql'
         required: true
       KERNEL_TREE_BRANCH:
         description: 'Kernel Tree Branch'
         required: true
-        default: 'zahedan-ksu'
+        default: 'lineage-21-ksu'
       CODENAME:
         description: 'Phone Codename'
-        default: 'k6877v1_64_k419'
+        default: 'sweet'
         required: true
       ANYKERNEL_URL:
         description: 'AnyKernel Url (leave blank if you dont want AnyKernel)'
-        default: 'https://github.com/itisFarzin/AnyKernel3'
+        default: 'https://github.com/sajadasadollahi83/AnyKernel3'
         required: false
       ANYKERNEL_BRANCH:
         description: 'AnyKernel Branch (defaults to codename)'
-        default: 'zahedan'
+        default: 'mastee'
         required: false
       SEND_NOTIFICATION:
         description: 'Send Notification'
@@ -76,12 +76,9 @@ jobs:
     - name: Prepare the build environment
       run: |
         sudo apt-get install flex
-        sudo apt-get install libncurses5
+        sudo apt-get install libncurses5 build-essential
         
-        git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-msm-redbull-4.19-android14 --depth=1
-        git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-msm-redbull-4.19-android14 --depth=1
-        
-        git clone https://github.com/itisFarzin/android_prebuilts_clang_host_linux-x86_clang-r416183b clang
+        git clone https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 --depth=1 toolchain
         
         echo "tools-folder=$(pwd)" >> $GITHUB_OUTPUT
       working-directory: ${{ steps.workspace.outputs.workspace-folder }}
@@ -111,23 +108,18 @@ jobs:
 
     - name: Building kernel
       run: |
-        export PATH="${{ steps.tools.outputs.tools-folder }}/aarch64-linux-android-4.9/bin:$PATH"
-        export PATH="${{ steps.tools.outputs.tools-folder }}/arm-linux-androideabi-4.9/bin:$PATH"
-        export PATH="${{ steps.tools.outputs.tools-folder }}/clang/bin:$PATH"
-        export LD_LIBRARY_PATH="${{ steps.tools.outputs.tools-folder }}/clang/lib64:$LD_LIBRARY_PATH"
-        export LD_LIBRARY_PATH="${{ steps.tools.outputs.tools-folder }}/clang/lib:$LD_LIBRARY_PATH"
+        export PATH="${{ steps.tools.outputs.tools-folder }}/toolchain/bin:$PATH"
+        export LD_LIBRARY_PATH="${{ steps.tools.outputs.tools-folder }}/toolchain/lib:$LD_LIBRARY_PATH"
 
         export ARCH=arm64
-        export SUBARCH=ARM64
-        export CLANG_TRIPLE=aarch64-linux-gnu-
         export CROSS_COMPILE=aarch64-linux-gnu-
-        export CROSS_COMPILE_ARM32=arm-linux-androideabi-
+        export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
-        export KBUILD_BUILD_USER="itisFarzin"
+        export KBUILD_BUILD_USER="Ventur"
         export KBUILD_BUILD_HOST="Github"
 
         make O=out CC=clang ${{ github.event.inputs.CODENAME }}_defconfig LLVM=1 LLVM_IAS=1 LD=ld.lld HOSTLD=ld.lld HOSTLDFLAGS=-fuse-ld=lld
-        make O=out CC=clang -j$(nproc --all) HOSTCC=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang HOSTCXX=${{ steps.tools.outputs.tools-folder }}/clang/bin/clang++ LD=${{ steps.tools.outputs.tools-folder }}/clang/bin/ld.lld AR=${{ steps.tools.outputs.tools-folder }}/clang/bin/llvm-ar LLVM=1 LLVM_IAS=1 CC=" clang --cuda-path=/dev/null"
+        make O=out CC=clang -j$(nproc --all) HOSTCC=${{ steps.tools.outputs.tools-folder }}/toolchain/bin/clang HOSTCXX=${{ steps.tools.outputs.tools-folder }}/toolchain/bin/clang++ LD=${{ steps.tools.outputs.tools-folder }}/toolchain/bin/ld.lld AR=${{ steps.tools.outputs.tools-folder }}/toolchain/bin/llvm-ar LLVM=1 LLVM_IAS=1 CC=" clang --cuda-path=/dev/null"
 
         echo "elapsed_time=$(echo "$(date +%s)"-"${{ steps.workspace.outputs.start_time }}" | bc)" >> $GITHUB_OUTPUT
       working-directory: ${{ steps.kernel.outputs.kernel-folder }}
