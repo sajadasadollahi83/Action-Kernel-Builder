@@ -1,0 +1,51 @@
+name: Build Kernel for sweet test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # Scheduled to run at midnight UTC every day.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y flex bison build-essential ccache libssl-dev libelf-dev libncurses5-dev libncursesw5-dev llvm lld clang
+
+    - name: Checkout kernel source
+      uses: actions/checkout@v2
+      with:
+        repository: 'sajadasadollahi84/kernel_xiaomi_sweet_kewl'
+        ref: 'lineage-21-ksu'
+
+    - name: Clone toolchain
+      run: |
+        git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 toolchain
+        echo "PATH=$(pwd)/toolchain/bin:/usr/lib/ccache:$PATH" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=$(pwd)/toolchain/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
+    - name: Set up environment
+      run: |
+        echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
+        echo "KBUILD_BUILD_HOST=playground" >> $GITHUB_ENV
+
+    - name: Build Kernel
+      run: |
+        make O=out ARCH=arm64 sweet_user_defconfig
+        make -j$(nproc) \
+          O=out \
+          ARCH=arm64 \
+          LLVM_IAS=1 \
+          CC="ccache clang" \
+          LD=ld.lld \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: kernel
+        path: out/arch/arm64/boot/Image.gz-dtb
