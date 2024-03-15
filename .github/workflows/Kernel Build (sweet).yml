@@ -8,7 +8,7 @@ on:
         required: false
       KERNEL_TREE:
         description: 'Kernel Tree'
-        default: 'https://github.com/sajadasadollahi83/kernel_xiaomi_sweet_keql'
+        default: 'https://github.com/sajadasadollahi83/kernel_xiaomi_sweet_kewl'
         required: true
       KERNEL_TREE_BRANCH:
         description: 'Kernel Tree Branch'
