@@ -76,15 +76,14 @@ jobs:
     - name: Prepare the build environment
       run: |
         sudo apt-get install flex
-        sudo apt-get install libncurses5 build-essential ccache libyaml-dev
+        sudo apt-get install libncurses5 build-essential ccache libyaml-dev llvm
         
         if [ ! -d "toolchain" ]; then
           git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 toolchain
         fi
         echo "PATH=$(pwd)/toolchain/bin:$PATH" >> $GITHUB_ENV
+        PATH=$(pwd)/toolchain/bin:/usr/lib/ccache:$PATH" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=$(pwd)/toolchain/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-        echo "PATH=/usr/lib/ccache:$PATH" >> $GITHUB_ENV
-        
         echo "tools-folder=$(pwd)" >> $GITHUB_OUTPUT
         
 
