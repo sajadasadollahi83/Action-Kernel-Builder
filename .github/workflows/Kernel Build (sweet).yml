@@ -86,7 +86,7 @@ jobs:
         echo "tools-folder=$(pwd)" >> $GITHUB_OUTPUT
 
         echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
-        echo "KBUILD_BUILD_HOST=playground" >> $GITHUB_ENV
+        echo "KBUILD_BUILD_HOST=GitHub" >> $GITHUB_ENV
       working-directory: ${{ steps.workspace.outputs.workspace-folder }}
       id: tools
 
@@ -119,7 +119,7 @@ jobs:
           O=out \
           ARCH=arm64 \
           LLVM_IAS=1 \
-          CC="ccache clang" \
+          CC="clang" \
           LD=ld.lld \
           CROSS_COMPILE=aarch64-linux-gnu- \
           CROSS_COMPILE_ARM32=arm-linux-gnueabi-
