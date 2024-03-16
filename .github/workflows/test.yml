@@ -1,51 +1,65 @@
-name: Build Kernel for sweet test
+name: Build Kernel
 
-on:
-  workflow_dispatch:
+on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install Essential Packages and Set Up GCC
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y fakeroot build-essential ncurses-dev xz-utils libssl-dev bc flex libelf-dev bison gcc-9 g++-9
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9
-        sudo update-alternatives --config gcc
-        gcc --version
-
-    - name: Checkout kernel source
+    - name: Checkout Repo
       uses: actions/checkout@v2
       with:
         repository: 'sajadasadollahi83/kernel_xiaomi_sweet_kewl'
-        ref: 'lineage-21-ksu'
-        token: ${{ secrets.GITHUB_TOKEN }}
-        path: 'kernel'
-        fetch-depth: 1
+        ref: 'main'
 
-    - name: Set up environment
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          bison \
+          flex \
+          libssl-dev \
+          libelf-dev \
+          bc \
+          ccache \
+          clang \
+          llvm \
+          lld
+
+    - name: Clone Toolchain
+      run: |
+        git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 toolchain
+
+    - name: Set Environment Variables
+      run: |
+        echo "ARCH=arm64" >> $GITHUB_ENV
         echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
-        echo "KBUILD_BUILD_HOST=GitHub" >> $GITHUB_ENV
-        echo "LDFLAGS=-L/usr/lib/x86_64-linux-gnu -lyaml" >> $GITHUB_ENV
-
-    - name: Prepare Kernel Configuration
-      run: |
-        cd kernel
-        make O=out clean
-        make O=out olddefconfig
+        echo "PATH=$(pwd)/toolchain/bin/:$PATH" >> $GITHUB_ENV
 
     - name: Build Kernel
       run: |
-        cd kernel
         make O=out ARCH=arm64 sweet_user_defconfig
-        make -j$(nproc) O=out ARCH=arm64
+        make -j$(nproc) \
+          O=out \
+          ARCH=arm64 \
+          LLVM_IAS=1 \
+          CC="ccache clang" \
+          LD=ld.lld \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
-    - name: Upload Kernel Artifact
+    - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: kernel
-        path: kernel/out/arch/arm64/boot/Image.gz-dtb
-        
+        name: kernel-build
+        path: |
+          out/arch/arm64/boot/Image.gz-dtb
+          out/arch/arm64/boot/dtbo.img
+          
