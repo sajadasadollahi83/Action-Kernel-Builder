@@ -10,6 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Check yaml.h availability
+      run: |
+        if [ -f /usr/include/yaml.h ]; then
+          echo "yaml.h is available."
+        else
+          echo "yaml.h is not available."
+        fi
+        
     - name: Setup Environment
       run: |
         sudo apt-get update
