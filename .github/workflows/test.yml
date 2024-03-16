@@ -1,6 +1,7 @@
-name: Build Kewl Kernel for sweet
+name: Build Kernel
 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -35,7 +36,7 @@ jobs:
 
     - name: Clone Toolchain
       run: |
-        git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 17 toolchain
+        git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 toolchain
 
     - name: Set Environment Variables
       run: |
@@ -45,7 +46,7 @@ jobs:
 
     - name: Build Kernel
       run: |
-        make O=out ARCH=arm64 /vendor/sweet_user_defconfig
+        make O=out ARCH=arm64 sweet_user_defconfig
         make -j$(nproc) \
           O=out \
           ARCH=arm64 \
