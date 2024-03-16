@@ -2,8 +2,6 @@ name: Build Kernel for sweet test
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *'  # Run at midnight UTC every day.
 
 jobs:
   build:
@@ -22,11 +20,12 @@ jobs:
         ref: 'lineage-21-ksu'
         token: ${{ secrets.GITHUB_TOKEN }}
         path: 'kernel'
+        fetch-depth: 1
 
     - name: Clone PixelOS playground toolchain
       run: |
         git clone --quiet --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 17 toolchain > /dev/null 2>&1
-        echo "PATH=$(pwd)/toolchain/bin:/usr/lib/ccache:$PATH" >> $GITHUB_ENV
+        echo "PATH=$(pwd)/toolchain/bin:$PATH" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=$(pwd)/toolchain/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: Set up environment
@@ -35,11 +34,16 @@ jobs:
         echo "KBUILD_BUILD_HOST=GitHub" >> $GITHUB_ENV
         echo "LDFLAGS=-L/usr/lib/x86_64-linux-gnu -lyaml" >> $GITHUB_ENV
 
-    - name: Build Kernel with Verbose Output
+    - name: Clean Build Directory
+      run: |
+        cd kernel
+        make O=out clean
+
+    - name: Build Kernel
       run: |
         cd kernel
         make O=out ARCH=arm64 sweet_user_defconfig
-        make -j$(nproc) O=out ARCH=arm64 LLVM_IAS=1 CC="ccache clang" LD=ld.lld CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- V=1
+        make -j$(nproc) O=out ARCH=arm64
 
     - name: Upload Kernel Artifact
       uses: actions/upload-artifact@v2
