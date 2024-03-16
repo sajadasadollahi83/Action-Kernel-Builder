@@ -10,20 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check yaml.h availability
-      run: |
-        if [ -f /usr/include/yaml.h ]; then
-          echo "yaml.h is available."
-        else
-          echo "yaml.h is not available."
-        fi
-        
-    - name: Setup Environment
+    - name: Update, Upgrade and Install Packages
       run: |
         sudo apt-get update
-        sudo apt-get install -y flex bison build-essential ccache libssl-dev libelf-dev libncurses5-dev libncursesw5-dev llvm lld clang libyaml-dev device-tree-compiler libghc-libyaml-dev 
-        dtc --version
-        dpkg -l | grep libyaml
+        sudo apt-get upgrade -y
+        sudo apt-get install -y git-core gnupg flex bison gperf build-essential \
+          zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 \
+          lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev ccache \
+          libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig libssl-dev
 
     - name: Checkout kernel source
       uses: actions/checkout@v2
@@ -35,25 +29,20 @@ jobs:
 
     - name: Clone PixelOS playground toolchain
       run: |
-        git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 17 toolchain
-        # Set the PATH and LD_LIBRARY_PATH to include the toolchain binaries and libraries
+        git clone --quiet --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 17 toolchain > /dev/null 2>&1
         echo "PATH=$(pwd)/toolchain/bin:/usr/lib/ccache:$PATH" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=$(pwd)/toolchain/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: Set up environment
       run: |
-        # Set the build user and host for the kernel build process
         echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
         echo "KBUILD_BUILD_HOST=GitHub" >> $GITHUB_ENV
-        # Export LDFLAGS with the path to the libyaml library
-        echo "LDFLAGS=-L/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV
+        echo "LDFLAGS=-L/usr/lib/x86_64-linux-gnu -lyaml" >> $GITHUB_ENV
 
     - name: Build Kernel
       run: |
         cd kernel
-        # Configure the kernel build for the 'sweet' device
         make O=out ARCH=arm64 sweet_user_defconfig
-        # Build the kernel with the specified environment variables and toolchain
         make -j$(nproc) O=out ARCH=arm64 LLVM_IAS=1 CC="ccache clang" LD=ld.lld CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
     - name: Upload Kernel Artifact
