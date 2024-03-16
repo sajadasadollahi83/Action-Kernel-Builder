@@ -35,7 +35,7 @@ jobs:
 
     - name: Clone Toolchain
       run: |
-        git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 toolchain
+        git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 17 toolchain
 
     - name: Set Environment Variables
       run: |
