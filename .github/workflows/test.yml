@@ -10,8 +10,8 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v2
       with:
-        repository: 'sajadasadollahi83/kernel_xiaomi_sweet_kewl'
-        ref: 'lineage-21-ksu'
+        repository: 'Pulkit077/kernel_xiaomi_sweet'
+        ref: 'lineage-21'
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -45,7 +45,7 @@ jobs:
 
     - name: Build Kernel
       run: |
-        make O=out ARCH=arm64 sweet_user_defconfig
+        make O=out ARCH=arm64 /vendor/sweet_user_defconfig
         make -j$(nproc) \
           O=out \
           ARCH=arm64 \
