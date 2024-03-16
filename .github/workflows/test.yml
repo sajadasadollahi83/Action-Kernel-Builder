@@ -8,10 +8,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install Essential Packages for Kernel Building
+    - name: Install Essential Packages and Set Up GCC
       run: |
         sudo apt-get update
-        sudo apt-get install -y fakeroot build-essential ncurses-dev xz-utils libssl-dev bc flex libelf-dev bison
+        sudo apt-get install -y fakeroot build-essential ncurses-dev xz-utils libssl-dev bc flex libelf-dev bison gcc-9 g++-9
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9
+        sudo update-alternatives --config gcc
+        gcc --version
 
     - name: Checkout kernel source
       uses: actions/checkout@v2
@@ -22,27 +25,16 @@ jobs:
         path: 'kernel'
         fetch-depth: 1
 
-    - name: Clone PixelOS playground toolchain
-      run: |
-        git clone --quiet --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 17 toolchain > /dev/null 2>&1
-        echo "PATH=$(pwd)/toolchain/bin:$PATH" >> $GITHUB_ENV
-        echo "LD_LIBRARY_PATH=$(pwd)/toolchain/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
     - name: Set up environment
       run: |
         echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
         echo "KBUILD_BUILD_HOST=GitHub" >> $GITHUB_ENV
         echo "LDFLAGS=-L/usr/lib/x86_64-linux-gnu -lyaml" >> $GITHUB_ENV
 
-    - name: Clean Build Directory
+    - name: Prepare Kernel Configuration
       run: |
         cd kernel
         make O=out clean
-
-    - name: Modify Kernel Config
-      run: |
-        cd kernel
-        scripts/config --disable CONFIG_CC_STACKPROTECTOR_STRONG
         make O=out olddefconfig
 
     - name: Build Kernel
