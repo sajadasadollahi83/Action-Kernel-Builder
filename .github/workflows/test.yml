@@ -36,19 +36,24 @@ jobs:
     - name: Clone PixelOS playground toolchain
       run: |
         git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc.git -b 17 toolchain
+        # Set the PATH and LD_LIBRARY_PATH to include the toolchain binaries and libraries
         echo "PATH=$(pwd)/toolchain/bin:/usr/lib/ccache:$PATH" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=$(pwd)/toolchain/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: Set up environment
       run: |
+        # Set the build user and host for the kernel build process
         echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
         echo "KBUILD_BUILD_HOST=GitHub" >> $GITHUB_ENV
-        export LDFLAGS
+        # Export LDFLAGS with the path to the libyaml library
+        echo "LDFLAGS=-L/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV
 
     - name: Build Kernel
       run: |
         cd kernel
+        # Configure the kernel build for the 'sweet' device
         make O=out ARCH=arm64 sweet_user_defconfig
+        # Build the kernel with the specified environment variables and toolchain
         make -j$(nproc) O=out ARCH=arm64 LLVM_IAS=1 CC="ccache clang" LD=ld.lld CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
     - name: Upload Kernel Artifact
