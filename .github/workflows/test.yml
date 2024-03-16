@@ -34,7 +34,8 @@ jobs:
     - name: Set up environment
       run: |
         echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
-        echo "KBUILD_BUILD_HOST=playground" >> $GITHUB_ENV
+        echo "KBUILD_BUILD_HOST=GitHub" >> $GITHUB_ENV
+        export LDFLAGS
 
     - name: Build Kernel
       run: |
