@@ -10,8 +10,8 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v2
       with:
-        repository: 'Pulkit077/kernel_xiaomi_sweet'
-        ref: 'lineage-21'
+        repository: 'sajadasadollahi83/kernel_xiaomi_sweet_kewl'
+        ref: 'lineage-21-ksu'
 
     - name: Set up Python
       uses: actions/setup-python@v2
