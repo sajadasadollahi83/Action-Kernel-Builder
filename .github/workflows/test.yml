@@ -39,6 +39,12 @@ jobs:
         cd kernel
         make O=out clean
 
+    - name: Modify Kernel Config
+      run: |
+        cd kernel
+        scripts/config --disable CONFIG_CC_STACKPROTECTOR_STRONG
+        make O=out olddefconfig
+
     - name: Build Kernel
       run: |
         cd kernel
