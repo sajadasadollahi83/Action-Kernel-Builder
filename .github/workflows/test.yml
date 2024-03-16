@@ -10,14 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Update, Upgrade and Install Packages
+    - name: Install Essential Packages for Kernel Building
       run: |
         sudo apt-get update
-        sudo apt-get upgrade -y
-        sudo apt-get install -y git-core gnupg flex bison gperf build-essential \
-          zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 \
-          lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev ccache \
-          libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig libssl-dev
+        sudo apt-get install -y fakeroot build-essential ncurses-dev xz-utils libssl-dev bc flex libelf-dev bison
 
     - name: Checkout kernel source
       uses: actions/checkout@v2
@@ -39,11 +35,11 @@ jobs:
         echo "KBUILD_BUILD_HOST=GitHub" >> $GITHUB_ENV
         echo "LDFLAGS=-L/usr/lib/x86_64-linux-gnu -lyaml" >> $GITHUB_ENV
 
-    - name: Build Kernel
+    - name: Build Kernel with Verbose Output
       run: |
         cd kernel
         make O=out ARCH=arm64 sweet_user_defconfig
-        make -j$(nproc) O=out ARCH=arm64 LLVM_IAS=1 CC="ccache clang" LD=ld.lld CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+        make -j$(nproc) O=out ARCH=arm64 LLVM_IAS=1 CC="ccache clang" LD=ld.lld CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- V=1
 
     - name: Upload Kernel Artifact
       uses: actions/upload-artifact@v2
