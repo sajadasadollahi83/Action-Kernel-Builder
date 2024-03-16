@@ -13,7 +13,7 @@ jobs:
     - name: Setup Environment
       run: |
         sudo apt-get update
-        sudo apt-get install -y flex bison build-essential ccache libssl-dev libelf-dev libncurses5-dev libncursesw5-dev llvm lld clang libyaml-dev device-tree-compiler
+        sudo apt-get install -y flex bison build-essential ccache libssl-dev libelf-dev libncurses5-dev libncursesw5-dev llvm lld clang libyaml-dev device-tree-compiler libghc-libyaml-dev 
         dtc --version
         dpkg -l | grep libyaml
 
