@@ -1,4 +1,4 @@
-name: Build Kewl Kernel for sweet 
+name: Build Kewl Kernel for sweet
 
 on:
   workflow_dispatch:
@@ -30,19 +30,17 @@ jobs:
           libelf-dev \
           bc \
           ccache \
-          clang \
-          llvm \
-          lld
-
-    - name: Clone Toolchain
-      run: |
-        git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 toolchain
+          clang-18.1.1 \
+          llvm-18.1.1 \
+          lld-18.1.1
 
     - name: Set Environment Variables
       run: |
         echo "ARCH=arm64" >> $GITHUB_ENV
         echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
-        echo "PATH=$(pwd)/toolchain/bin/:$PATH" >> $GITHUB_ENV
+        echo "PATH=/usr/lib/llvm-18.1.1/bin:$PATH" >> $GITHUB_ENV
+        echo "CC=clang" >> $GITHUB_ENV
+        echo "LD=ld.lld" >> $GITHUB_ENV
 
     - name: Build Kernel
       run: |
