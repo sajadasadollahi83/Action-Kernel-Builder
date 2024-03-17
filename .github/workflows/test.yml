@@ -30,9 +30,9 @@ jobs:
           libelf-dev \
           bc \
           ccache \
-          clang-18.1.1 \
-          llvm-18.1.1 \
-          lld-18.1.1
+          clang \
+          llvm \
+          lld
 
     - name: Set Environment Variables
       run: |
