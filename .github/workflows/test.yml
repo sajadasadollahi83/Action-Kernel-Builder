@@ -19,6 +19,12 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: Install Clang 18
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 18
+
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -29,18 +35,15 @@ jobs:
           libssl-dev \
           libelf-dev \
           bc \
-          ccache \
-          clang \
-          llvm \
-          lld
+          ccache
 
     - name: Set Environment Variables
       run: |
         echo "ARCH=arm64" >> $GITHUB_ENV
         echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
-        echo "PATH=/usr/lib/llvm-18.1.1/bin:$PATH" >> $GITHUB_ENV
-        echo "CC=clang" >> $GITHUB_ENV
-        echo "LD=ld.lld" >> $GITHUB_ENV
+        echo "PATH=/usr/lib/llvm-18/bin:$PATH" >> $GITHUB_ENV
+        echo "CC=clang-18" >> $GITHUB_ENV
+        echo "LD=ld.lld-18" >> $GITHUB_ENV
 
     - name: Build Kernel
       run: |
@@ -49,8 +52,8 @@ jobs:
           O=out \
           ARCH=arm64 \
           LLVM_IAS=1 \
-          CC="ccache clang" \
-          LD=ld.lld \
+          CC="ccache clang-18" \
+          LD=ld.lld-18 \
           CROSS_COMPILE=aarch64-linux-gnu- \
           CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
@@ -60,5 +63,4 @@ jobs:
         name: kernel-build
         path: |
           out/arch/arm64/boot/Image.gz-dtb
-          out/arch/arm64/boot/dtbo.img
-          
+          out
