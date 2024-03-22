@@ -19,12 +19,12 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install PlayGround Clang 17 Toolchain
+    - name: Install Neutron Clang with AntMan
       run: |
-        if [ ! -d "toolchain" ]; then
-          git clone --depth=1 https://gitlab.com/PixelOS-Devices/playgroundtc -b 17 toolchain
-        fi
-        echo "PATH=$(pwd)/toolchain/bin:$PATH" >> $GITHUB_ENV
+        mkdir -p "$HOME/toolchains/neutron-clang"
+        cd "$HOME/toolchains/neutron-clang"
+        bash <(curl -s "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman") -S
+        echo "PATH=$HOME/toolchains/neutron-clang/bin:$PATH" >> $GITHUB_ENV
 
     - name: Install dependencies
       run: |
