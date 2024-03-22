@@ -12,7 +12,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: 'sajadasadollahi83/kernel_xiaomi_sweet_kewl'
-        ref: 'sajadasadollahi83-patch-2'
+        ref: 'lineage-21-ksu'
 
     - name: Install dependencies
       run: |
