@@ -12,7 +12,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: 'sajadasadollahi83/kernel_xiaomi_sweet_kewl'
-        ref: 'lineage-21-ksu'
+        ref: 'sajadasadollahi83-patch-2'
 
     - name: Install dependencies
       run: |
@@ -24,13 +24,19 @@ jobs:
         mkdir -p "$HOME/toolchains/neutron-clang"
         cd "$HOME/toolchains/neutron-clang"
         bash <(curl -s "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman") -S > /dev/null
+        echo "PATH=$HOME/toolchains/neutron-clang/bin:$PATH" >> $GITHUB_ENV
+        echo "CC=clang" >> $GITHUB_ENV
+        echo "LD=ld.lld" >> $GITHUB_ENV
 
     - name: Set Environment Variables
       run: |
         echo "ARCH=arm64" >> $GITHUB_ENV
         echo "KBUILD_BUILD_USER=ventur" >> $GITHUB_ENV
+        echo "KBUILD_BUILD_HOST=github-actions" >> $GITHUB_ENV
         echo "CC=ccache clang" >> $GITHUB_ENV
         echo "LD=ld.lld" >> $GITHUB_ENV
+        echo "CROSS_COMPILE=aarch64-linux-gnu-" >> $GITHUB_ENV
+        echo "CROSS_COMPILE_ARM32=arm-linux-gnueabi-" >> $GITHUB_ENV
 
     - name: Build Kernel and DTBO
       run: |
