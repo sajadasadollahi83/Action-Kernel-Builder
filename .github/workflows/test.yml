@@ -8,35 +8,22 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Checkout Repo
+    - name: Checkout Repo and Set up Python
       uses: actions/checkout@v2
       with:
         repository: 'sajadasadollahi83/kernel_xiaomi_sweet_kewl'
-        ref: 'sajadasadollahi83-patch-2'
+        ref: 'lineage-21-ksu'
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential bison flex libssl-dev libelf-dev bc ccache glibc-source
 
     - name: Install Neutron Clang with AntMan
       run: |
         mkdir -p "$HOME/toolchains/neutron-clang"
         cd "$HOME/toolchains/neutron-clang"
-        bash <(curl -s "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman") -S
-        echo "PATH=$HOME/toolchains/neutron-clang/bin:$PATH" >> $GITHUB_ENV
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential \
-          bison \
-          flex \
-          libssl-dev \
-          libelf-dev \
-          bc \
-          ccache
+        bash <(curl -s "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman") -S > /dev/null
 
     - name: Set Environment Variables
       run: |
@@ -45,7 +32,7 @@ jobs:
         echo "CC=ccache clang" >> $GITHUB_ENV
         echo "LD=ld.lld" >> $GITHUB_ENV
 
-    - name: Build Kernel
+    - name: Build Kernel and DTBO
       run: |
         make O=out ARCH=arm64 sweet_user_defconfig
         make -j$(nproc) \
@@ -55,7 +42,8 @@ jobs:
           CC="ccache clang" \
           LD=ld.lld \
           CROSS_COMPILE=aarch64-linux-gnu- \
-          CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+          CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+          Image.gz-dtb dtbo.img
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
@@ -63,5 +51,6 @@ jobs:
         name: kernel-build
         path: |
           out/arch/arm64/boot/Image.gz-dtb
+          out/arch/arm64/boot/dtbo.img
           out
           
